@@ -98,11 +98,11 @@ const copyrightYear = new Date().getFullYear();
   </head>
   <body>
     <header class="site-header">
-      <div class="container flex min-h-16 items-center justify-between gap-6 py-3">
+      <div class="container flex flex-wrap min-h-16 items-center justify-between gap-x-6 gap-y-2 py-3">
         <a href={t.home} class="brand-logo" aria-label="Hải Anh Textile">
           <img src="/logo-ha.svg" alt="Hải Anh Textile" width="132" height="65" />
         </a>
-        <nav aria-label="Điều hướng chính" class="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm font-semibold">
+        <nav aria-label="Điều hướng chính" class="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm font-semibold">
           {nav.map(([label, href]) => {
             const active = isActiveNav(href);
             return (

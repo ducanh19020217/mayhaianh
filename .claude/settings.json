@@ -18,7 +18,12 @@
       "Read(//tmp/**)",
       "Bash(git pull *)",
       "Bash(npm install *)",
-      "Bash(grep -o \"\\\\.prose[^{,]*{[^}]\\\\{0,80\\\\}\" /media/veracrypt8/PersonalProject/MayHaiAnh/dist/_astro/BaseLayout.Dnizrqwz.css)"
+      "Bash(grep -o \"\\\\.prose[^{,]*{[^}]\\\\{0,80\\\\}\" /media/veracrypt8/PersonalProject/MayHaiAnh/dist/_astro/BaseLayout.Dnizrqwz.css)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(command -v chromium-cli)",
+      "Bash(time curl -sf http://localhost:4321/ -o /tmp/test-home.html --max-time 15)",
+      "Bash(ps aux | grep -i chrome | grep -v grep *)"
     ]
   }
 }
