@@ -13,7 +13,9 @@
       "Bash(git rm *)",
       "Bash(git rev-list *)",
       "Bash(git fetch *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(curl -s -D - https://nimble-belekoy-13471a.netlify.app/admin/ -o /tmp/admin_page.html)",
+      "Read(//tmp/**)"
     ]
   }
 }
