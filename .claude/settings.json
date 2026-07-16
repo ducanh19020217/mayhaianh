@@ -23,7 +23,10 @@
       "Skill(run:*)",
       "Bash(command -v chromium-cli)",
       "Bash(time curl -sf http://localhost:4321/ -o /tmp/test-home.html --max-time 15)",
-      "Bash(ps aux | grep -i chrome | grep -v grep *)"
+      "Bash(ps aux | grep -i chrome | grep -v grep *)",
+      "WebFetch(domain:pagespeed.web.dev)",
+      "Bash(curl -sI \"https://www.devstringx.com/wp-content/uploads/2022/08/SIEM-2-scaled.jpg\" --max-time 10 -A \"Mozilla/5.0\")",
+      "Bash(curl -s \"https://www.devstringx.com/wp-content/uploads/2022/08/SIEM-2-scaled.jpg\" --max-time 15 -A \"Mozilla/5.0\" -o /tmp/siem-test.jpg -w \"HTTP %{http_code}, size: %{size_download} bytes\\\\n\")"
     ]
   }
 }
