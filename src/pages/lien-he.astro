@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Liên hệ sản xuất may mặc xuất khẩu" description="Gửi yêu cầu sản xuất, tech pack hoặc thông tin đơn hàng may mặc xuất khẩu cho Hải Anh Textile.">
+  <section class="container grid gap-10 py-12 md:grid-cols-[0.9fr_1.1fr] md:py-16">
+    <div>
+      <p class="eyebrow">Liên hệ</p>
+      <h1 class="heading mt-4 text-5xl md:text-7xl">Gửi tech pack hoặc yêu cầu báo giá.</h1>
+      <p class="mt-6 text-soft">Form dùng Formspree, không có backend tự viết và không lưu dữ liệu người dùng trên site.</p>
+    </div>
+    <form class="border border-line p-5" action="https://formspree.io/f/your-form-id" method="POST">
+      <input type="text" name="_gotcha" class="hidden" tabindex="-1" autocomplete="off" />
+      <label class="block text-sm font-semibold" for="name">Tên liên hệ</label>
+      <input class="mt-2 w-full border border-line bg-bg px-3 py-3" id="name" name="name" required />
+      <label class="mt-4 block text-sm font-semibold" for="email">Email</label>
+      <input class="mt-2 w-full border border-line bg-bg px-3 py-3" id="email" name="email" type="email" required />
+      <label class="mt-4 block text-sm font-semibold" for="category">Nhóm sản phẩm</label>
+      <select class="mt-2 w-full border border-line bg-bg px-3 py-3" id="category" name="category">
+        <option>Dệt kim</option>
+        <option>Đồ lót / đồ bơi</option>
+        <option>Dệt len</option>
+        <option>Khác</option>
+      </select>
+      <label class="mt-4 block text-sm font-semibold" for="message">Nội dung</label>
+      <textarea class="mt-2 min-h-40 w-full border border-line bg-bg px-3 py-3" id="message" name="message" required></textarea>
+      <button class="btn btn-primary mt-5" type="submit">Gửi yêu cầu</button>
+    </form>
+  </section>
+</BaseLayout>

@@ -1,0 +1,80 @@
+---
+import '../styles/global.css';
+import { site, defaultOgImage } from '../lib/site';
+
+type Props = {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article' | 'product';
+  canonical?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+};
+
+const {
+  title = site.title,
+  description = site.description,
+  image = defaultOgImage,
+  type = 'website',
+  canonical = new URL(Astro.url.pathname, site.url).toString(),
+  jsonLd
+} = Astro.props;
+const absoluteImage = new URL(image, site.url).toString();
+const nav = [
+  ['Trang chủ', '/'],
+  ['Giới thiệu', '/gioi-thieu/'],
+  ['Sản phẩm', '/san-pham/'],
+  ['Tin tức', '/tin-tuc/'],
+  ['Liên hệ', '/lien-he/']
+];
+---
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteImage} />
+    <meta property="og:type" content={type === 'article' ? 'article' : 'website'} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteImage} />
+    {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    <header class="border-b border-line bg-bg/95">
+      <div class="container flex min-h-16 items-center justify-between gap-6 py-3">
+        <a href="/" class="font-mono text-sm font-semibold text-primary">HAI ANH / EXPORT</a>
+        <nav aria-label="Điều hướng chính" class="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm font-semibold">
+          {nav.map(([label, href]) => <a class="hover:text-primary" href={href}>{label}</a>)}
+        </nav>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="mt-20 bg-ink text-bg">
+      <div class="container grid gap-8 py-10 md:grid-cols-[1.5fr_1fr_1fr]">
+        <div>
+          <p class="font-mono text-sm text-accent">HAI ANH TEXTILE</p>
+          <p class="mt-3 max-w-xl text-sm text-bg/75">Năng lực may xuất khẩu dệt kim, đồ lót, đồ bơi và dệt len. Site tĩnh, không lưu dữ liệu người dùng trên máy chủ riêng.</p>
+        </div>
+        <div class="text-sm text-bg/75">
+          <p class="font-semibold text-bg">Liên hệ</p>
+          <p>{site.phone}</p>
+          <p>{site.email}</p>
+        </div>
+        <div class="text-sm text-bg/75">
+          <p class="font-semibold text-bg">Thị trường</p>
+          <p>Mỹ / EU / đơn hàng OEM, ODM có kiểm soát chất lượng.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,132 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { getAssetImage, getImageUrl, isRemoteImage } from '../lib/images';
+import { site } from '../lib/site';
+
+const products = await getCollection('products');
+const factories = (await getCollection('factories')).sort((a, b) => a.data.order - b.data.order);
+const heroImage = getAssetImage('hero-quality-control.png');
+const capabilities = [
+  ['Dệt kim', 'Jersey, pique, interlock, rib và đồ mặc nhà có kiểm soát co rút.'],
+  ['Đồ lót / đồ bơi', 'Sản phẩm co giãn cao, elastic, lining và fitting theo spec.'],
+  ['Dệt len', 'Sweater panel, rib cuff, phụ kiện len theo gauge và thành phần sợi.'],
+  ['Hoàn thiện xuất khẩu', 'QC inline, kiểm cuối, đóng gói, carton mark và hồ sơ giao hàng.']
+];
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.name,
+  url: site.url,
+  telephone: site.phone,
+  address: factories.map((factory) => ({
+    '@type': 'PostalAddress',
+    name: factory.data.name,
+    streetAddress: factory.data.address,
+    addressCountry: 'VN'
+  }))
+};
+---
+<BaseLayout title={site.title} description={site.description} image="/og-default.png" jsonLd={orgJsonLd}>
+  <section class="container grid gap-10 py-12 md:grid-cols-[1.1fr_0.9fr] md:py-20">
+    <div class="flex flex-col justify-center">
+      <p class="eyebrow">OEM / ODM garment export</p>
+      <h1 class="heading mt-4 max-w-3xl text-5xl md:text-7xl">May mặc xuất khẩu từ xưởng dệt kim, len và hàng co giãn.</h1>
+      <p class="mt-6 max-w-2xl text-lg text-soft">Hải Anh Textile phát triển và sản xuất hàng dệt kim, đồ lót, đồ bơi, dệt len cho khách hàng Mỹ và EU, với 4 nhà máy phối hợp theo hồ sơ kỹ thuật và tiêu chuẩn kiểm hàng rõ ràng.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/san-pham/" class="btn btn-primary">Xem nhóm sản phẩm</a>
+        <a href="/lien-he/" class="btn btn-plain">Gửi tech pack</a>
+      </div>
+    </div>
+    <aside class="bg-ink p-5 text-bg md:mt-10">
+      <p class="font-mono text-sm text-accent">SPEC CARD / HAI ANH</p>
+      <div class="mt-6 grid grid-cols-2 border border-bg/20">
+        {[
+          ['2008', 'năm thành lập'],
+          ['04', 'nhà máy'],
+          ['US/EU', 'thị trường'],
+          ['OEM+ODM', 'mô hình']
+        ].map(([value, label]) => (
+          <div class="border-b border-r border-bg/20 p-4 last:border-r-0">
+            <p class="font-mono text-3xl text-accent">{value}</p>
+            <p class="mt-1 text-sm text-bg/70">{label}</p>
+          </div>
+        ))}
+      </div>
+      <Image class="mt-5 aspect-[4/3] w-full object-cover" src={heroImage} alt="Bàn kiểm hàng may mặc với áo dệt kim, swatch vải, thước dây và con dấu chất lượng" width={720} loading="eager" />
+    </aside>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow="Năng lực theo thứ tự chuyền" title="Từ mẫu kỹ thuật đến đóng gói xuất khẩu." lead="Các năng lực được trình bày như một trình tự sản xuất, không phải nhóm icon trang trí." />
+    <div class="technical-grid grid-cols-1 md:grid-cols-4">
+      {capabilities.map(([title, text], index) => (
+        <article class="technical-cell min-h-60 p-5">
+          <p class="font-mono text-sm text-primary">{String(index + 1).padStart(2, '0')}</p>
+          <h3 class="mt-10 text-xl font-semibold">{title}</h3>
+          <p class="mt-3 text-sm text-soft">{text}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow="Sản phẩm nổi bật" title="Ba nhóm hàng chính cho chuỗi cung ứng xuất khẩu." />
+    <div class="grid gap-5 md:grid-cols-3">
+      {products.map((product) => (
+        <a href={`/san-pham/${product.id}/`} class="thread-hover block border border-line bg-bg">
+          {isRemoteImage(product.data.image) ? (
+            <img class="aspect-[4/3] w-full object-cover" src={getImageUrl(product.data.image)} alt={product.data.imageAlt} loading="lazy" />
+          ) : (
+            <Image class="aspect-[4/3] w-full object-cover" src={getAssetImage(product.data.image)} alt={product.data.imageAlt} width={520} />
+          )}
+          <div class="p-5">
+            <p class="font-mono text-xs text-primary">{product.data.category}</p>
+            <h3 class="mt-2 text-xl font-semibold">{product.data.name}</h3>
+            <p class="mt-3 text-sm text-soft">{product.data.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow="Nhà máy" title="4 điểm sản xuất, một chuẩn kiểm hàng." />
+    <div class="technical-grid grid-cols-1 md:grid-cols-4">
+      {factories.map((factory) => (
+        <article class="technical-cell p-5">
+          <p class="font-mono text-sm text-accent">{String(factory.data.order).padStart(2, '0')}</p>
+          <h3 class="mt-8 font-semibold">{factory.data.name}</h3>
+          <p class="mt-3 text-sm text-soft">{factory.data.address}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container grid gap-6 py-4 md:grid-cols-[0.8fr_1.2fr]">
+    <SectionHeader eyebrow="Đối tác" title="Làm việc theo hồ sơ kỹ thuật, lịch giao hàng và tiêu chuẩn kiểm cuối." />
+    <div class="grid grid-cols-2 border border-line md:grid-cols-4">
+      {['Private Label', 'Importer', 'Retailer', 'Sourcing Office'].map((item) => (
+        <div class="border-b border-r border-line p-5 font-mono text-sm text-soft">{item}</div>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container bg-ink p-6 text-bg md:p-10">
+    <p class="eyebrow text-accent">Liên hệ sản xuất</p>
+    <h2 class="heading mt-3 max-w-3xl text-3xl md:text-5xl">Gửi tech pack, BOM hoặc mẫu tham chiếu để nhận phản hồi năng lực.</h2>
+    <a href="/lien-he/" class="btn mt-7 border-accent text-accent">Mở form liên hệ</a>
+  </section>
+</BaseLayout>

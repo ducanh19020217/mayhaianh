@@ -1,0 +1,49 @@
+---
+---
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Hải Anh Textile CMS</title>
+  </head>
+  <body>
+    <script is:inline src="https://unpkg.com/decap-cms@^3.6.0/dist/decap-cms.js"></script>
+    <script is:inline>
+      const SEOCheckerControl = createClass({
+        render: function () {
+          const entry = this.props.entry;
+          const data = entry.get('data').toJS();
+          const body = entry.get('body') || '';
+          const title = data.title || data.name || '';
+          const description = data.description || '';
+          const alt = data.coverImageAlt || data.imageAlt || '';
+          const wordCount = String(body).trim().split(/\s+/).filter(Boolean).length;
+          const checks = [
+            ['Tiêu đề 50-60 ký tự', title.length >= 50 && title.length <= 60, title.length],
+            ['Meta description 150-160 ký tự', description.length >= 150 && description.length <= 160, description.length],
+            ['Có alt text ảnh', alt.trim().length > 0, alt ? 'ok' : 'thiếu'],
+            ['Nội dung tối thiểu 300 từ', wordCount >= 300, wordCount]
+          ];
+          const rows = checks.map(([label, pass, value]) => h('li', {
+            style: {
+              margin: '8px 0',
+              color: pass ? '#138A36' : '#A6241A',
+              fontFamily: 'monospace'
+            }
+          }, `${pass ? 'XANH' : 'ĐỎ'} - ${label}: ${value}`));
+          return h('div', {
+            style: {
+              border: '1px solid #d7cabb',
+              padding: '12px',
+              background: '#FBF6EC',
+              color: '#2B211C'
+            }
+          }, h('strong', {}, 'SEO Checker'), h('ul', {}, rows));
+        }
+      });
+      CMS.registerWidget('seo_checker', SEOCheckerControl);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAssetImage, getImageUrl, isRemoteImage } from '../../lib/images';
+import { site } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const products = await getCollection('products');
+  return products.map((product) => ({ params: { slug: product.id }, props: { product } }));
+}
+
+const { product } = Astro.props as { product: CollectionEntry<'products'> };
+const { Content } = await render(product);
+const productImageUrl = getImageUrl(product.data.image);
+const productImage = isRemoteImage(product.data.image) ? undefined : getAssetImage(product.data.image);
+const productJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.data.name,
+  description: product.data.description,
+  category: product.data.category,
+  image: new URL(productImage?.src ?? productImageUrl, site.url).toString(),
+  brand: { '@type': 'Brand', name: site.name }
+};
+---
+<BaseLayout title={`${product.data.name} | Hải Anh Textile`} description={product.data.description} image={productImage?.src ?? productImageUrl} type="product" jsonLd={productJsonLd}>
+  <article class="container grid gap-10 py-12 md:grid-cols-[0.9fr_1.1fr] md:py-16">
+    <div>
+      <p class="eyebrow">{product.data.category}</p>
+      <h1 class="heading mt-4 text-5xl md:text-7xl">{product.data.name}</h1>
+      <p class="mt-6 text-lg text-soft">{product.data.description}</p>
+    </div>
+    {productImage ? (
+      <Image class="aspect-[4/3] w-full object-cover" src={productImage} alt={product.data.imageAlt} width={820} loading="eager" />
+    ) : (
+      <img class="aspect-[4/3] w-full object-cover" src={productImageUrl} alt={product.data.imageAlt} loading="eager" />
+    )}
+  </article>
+  <div class="stitch-line" aria-hidden="true"></div>
+  <section class="container prose max-w-3xl py-4 prose-p:text-soft">
+    <Content />
+  </section>
+</BaseLayout>

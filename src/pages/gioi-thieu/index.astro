@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+---
+<BaseLayout title="Giới thiệu Hải Anh Textile" description="Lịch sử phát triển, tầm nhìn sứ mệnh và cơ cấu tổ chức của Hải Anh Textile.">
+  <section class="container py-12 md:py-16">
+    <p class="eyebrow">Giới thiệu</p>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">Một hệ thống sản xuất may mặc xuất khẩu đặt trọng tâm vào spec.</h1>
+  </section>
+  <div class="stitch-line" aria-hidden="true"></div>
+  <section class="container grid gap-8 py-4 md:grid-cols-3">
+    <article class="border border-line p-5">
+      <SectionHeader eyebrow="01" title="Lịch sử phát triển" />
+      <p class="text-soft">Từ xưởng dệt kim ban đầu, Hải Anh Textile mở rộng sang đồ lót, đồ bơi và dệt len để phục vụ chuỗi đơn hàng xuất khẩu có yêu cầu kỹ thuật cao.</p>
+    </article>
+    <article class="border border-line p-5">
+      <SectionHeader eyebrow="02" title="Tầm nhìn sứ mệnh" />
+      <p class="text-soft">Xây dựng năng lực may mặc Việt Nam theo hướng minh bạch hồ sơ, ổn định chất lượng và giao hàng có thể dự báo.</p>
+    </article>
+    <article class="border border-line p-5">
+      <SectionHeader eyebrow="03" title="Cơ cấu tổ chức" />
+      <p class="text-soft">Các bộ phận mẫu, kế hoạch, mua hàng, chuyền may, QC và logistics phối hợp quanh tech pack và lịch xuất hàng đã khóa.</p>
+    </article>
+  </section>
+</BaseLayout>
