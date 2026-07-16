@@ -4,3 +4,10 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Decap CMS (loaded from unpkg) needs 'unsafe-eval' and web workers/blob URLs
+# to run, and Git Gateway needs to reach Netlify's and GitHub's APIs. A
+# separate, more specific block here overrides the site-wide CSP above for
+# everything under /admin/.
+/admin/*
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self' https://unpkg.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://identity.netlify.com; connect-src 'self' https://api.netlify.com https://*.netlify.com https://api.github.com https://*.githubusercontent.com; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'
