@@ -5,6 +5,13 @@
 [build.environment]
   NODE_VERSION = "22.21.1"
 
+# Astro's build already minifies CSS/JS and optimizes images (hashed
+# filenames, webp output), so Netlify's own post-processing step is
+# redundant here and has been known to hang for a long time on some
+# builds. Skip it entirely.
+[build.processing]
+  skip_processing = true
+
 [[headers]]
   for = "/admin/*"
   [headers.values]

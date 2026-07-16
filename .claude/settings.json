@@ -7,7 +7,13 @@
       "Read(//home/ducanh/.nvm/versions/node/**)",
       "Bash(python3 -c \"import reportlab\")",
       "Bash(node -e \"require\\('puppeteer'\\)\")",
-      "Bash(pdfinfo /media/veracrypt8/PersonalProject/MayHaiAnh/public/catalog/hai-anh-textile-catalog-vi.pdf)"
+      "Bash(pdfinfo /media/veracrypt8/PersonalProject/MayHaiAnh/public/catalog/hai-anh-textile-catalog-vi.pdf)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git rm *)",
+      "Bash(git rev-list *)",
+      "Bash(git fetch *)",
+      "Bash(git push *)"
     ]
   }
 }
