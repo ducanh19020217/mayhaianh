@@ -1,17 +1,15 @@
+# local_backend: true makes Decap CMS auto-use the local proxy (npm run dev:cms,
+# served on :8081) whenever the admin UI is opened from localhost — the
+# `backend` below only takes effect on the deployed (Netlify) site.
 local_backend: true
 
+# Netlify Git Gateway: no separate OAuth app/server needed. Enable "Identity"
+# and "Git Gateway" for this site in the Netlify dashboard, then invite
+# yourself as a user under Identity so you can log in at /admin on the
+# deployed site.
 backend:
-  name: proxy
-  proxy_url: http://localhost:8081/api/v1
+  name: git-gateway
   branch: main
-
-# Production GitHub backend, enable this block when the site has GitHub OAuth.
-# backend:
-#   name: github
-#   repo: your-org/may-hai-anh
-#   branch: main
-#   base_url: https://your-oauth-service.example.com
-#   auth_endpoint: auth
 
 publish_mode: editorial_workflow
 media_folder: "src/assets"
