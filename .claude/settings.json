@@ -15,7 +15,10 @@
       "Bash(git fetch *)",
       "Bash(git push *)",
       "Bash(curl -s -D - https://nimble-belekoy-13471a.netlify.app/admin/ -o /tmp/admin_page.html)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(git pull *)",
+      "Bash(npm install *)",
+      "Bash(grep -o \"\\\\.prose[^{,]*{[^}]\\\\{0,80\\\\}\" /media/veracrypt8/PersonalProject/MayHaiAnh/dist/_astro/BaseLayout.Dnizrqwz.css)"
     ]
   }
 }
