@@ -1,0 +1,43 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { isLanguage, localized, aboutSectionPaths, type Language } from '../../../lib/i18n';
+import { breadcrumbJsonLd } from '../../../lib/site';
+
+export async function getStaticPaths() {
+  const sectionSlugs = { history: 'development', vision: 'purpose', organization: 'organization' } as const;
+  const entries = await getCollection('about');
+  return ['en', 'zh'].flatMap((lang) =>
+    (Object.keys(sectionSlugs) as (keyof typeof sectionSlugs)[]).map((section) => {
+      const entry =
+        entries.find((item) => item.data.section === section && item.data.language === lang) ??
+        entries.find((item) => item.data.section === section && item.data.language === 'vi');
+      return { params: { lang, section: sectionSlugs[section] }, props: { entry, lang } };
+    })
+  );
+}
+
+const { entry, lang: routeLang } = Astro.props as { entry: CollectionEntry<'about'>; lang: Language };
+const lang = isLanguage(routeLang) ? routeLang : 'en';
+const { Content } = await render(entry);
+const alternates = aboutSectionPaths[entry.data.section];
+const breadcrumbs = breadcrumbJsonLd([
+  { name: localized[lang].nav[0], url: localized[lang].home },
+  { name: localized[lang].nav[1], url: localized[lang].about },
+  { name: entry.data.title, url: alternates[lang] }
+]);
+---
+<BaseLayout lang={lang} title={`${entry.data.title} | Hải Anh Textile`} description={entry.data.summary} jsonLd={breadcrumbs} alternates={alternates}>
+  <section class="container py-12 md:py-16">
+    <p class="eyebrow">{lang === 'zh' ? '关于我们' : 'About'}</p>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{entry.data.title}</h1>
+    <p class="mt-6 max-w-3xl text-lg text-soft">{entry.data.summary}</p>
+    <a href={localized[lang].about} class="btn btn-plain mt-8">{lang === 'zh' ? '返回关于我们' : 'Back to about'}</a>
+  </section>
+  <div class="stitch-line" aria-hidden="true"></div>
+  <section class="container py-4">
+    <div class="prose max-w-3xl prose-p:text-soft">
+      <Content />
+    </div>
+  </section>
+</BaseLayout>

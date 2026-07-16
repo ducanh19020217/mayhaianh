@@ -1,4 +1,5 @@
 ---
+language: "vi"
 title: "Kiểm soát chất lượng dệt kim cho đơn hàng xuất khẩu"
 date: 2026-07-01
 description: "Các điểm kiểm soát chất lượng dệt kim quan trọng trước khi xuất khẩu: GSM, co rút, màu, đường may và đóng gói."

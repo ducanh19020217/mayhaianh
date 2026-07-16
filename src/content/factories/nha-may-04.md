@@ -1,5 +1,6 @@
 ---
-name: "Nhà máy 04 - Hoàn thiện & đóng gói"
-address: "Trung tâm logistics dệt may, Hải Phòng, Việt Nam"
+language: "vi"
+name: "Nhà máy 4"
+address: "Cụm Công Nghiệp Tư Sy, xã Nga Sơn, Thanh Hóa"
 order: 4
 ---

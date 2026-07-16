@@ -3,11 +3,19 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeader from '../components/SectionHeader.astro';
+import HomeMediaDeck from '../components/HomeMediaDeck.astro';
+import ClientMarquee from '../components/ClientMarquee.astro';
 import { getAssetImage, getImageUrl, isRemoteImage } from '../lib/images';
 import { site } from '../lib/site';
+import { filterByLanguage } from '../lib/i18n';
 
-const products = await getCollection('products');
-const factories = (await getCollection('factories')).sort((a, b) => a.data.order - b.data.order);
+const products = filterByLanguage(await getCollection('products'), 'vi');
+const factories = filterByLanguage(await getCollection('factories'), 'vi').sort((a, b) => a.data.order - b.data.order);
+const homeBanners = filterByLanguage(await getCollection('homeBanners'), 'vi').sort((a, b) => a.data.order - b.data.order);
+const homeSetting = filterByLanguage(await getCollection('homeSettings'), 'vi')[0];
+const certifications = filterByLanguage(await getCollection('certifications'), 'vi').sort((a, b) => a.data.order - b.data.order);
+const caseStudies = filterByLanguage(await getCollection('caseStudies'), 'vi').sort((a, b) => a.data.order - b.data.order);
+const clients = filterByLanguage(await getCollection('clients'), 'vi').sort((a, b) => a.data.order - b.data.order);
 const heroImage = getAssetImage('hero-quality-control.png');
 const capabilities = [
   ['Dệt kim', 'Jersey, pique, interlock, rib và đồ mặc nhà có kiểm soát co rút.'],
@@ -30,18 +38,26 @@ const orgJsonLd = {
 };
 ---
 <BaseLayout title={site.title} description={site.description} image="/og-default.png" jsonLd={orgJsonLd}>
-  <section class="container grid gap-10 py-12 md:grid-cols-[1.1fr_0.9fr] md:py-20">
-    <div class="flex flex-col justify-center">
+  <HomeMediaDeck lang="vi" banners={homeBanners} setting={homeSetting} />
+
+  <section class="container py-10 md:py-16">
+    <div class="hero-panel grid gap-0 md:grid-cols-[1.08fr_0.92fr]">
+    <div class="flex min-h-[560px] flex-col justify-center p-6 md:p-10">
       <p class="eyebrow">OEM / ODM garment export</p>
       <h1 class="heading mt-4 max-w-3xl text-5xl md:text-7xl">May mặc xuất khẩu từ xưởng dệt kim, len và hàng co giãn.</h1>
       <p class="mt-6 max-w-2xl text-lg text-soft">Hải Anh Textile phát triển và sản xuất hàng dệt kim, đồ lót, đồ bơi, dệt len cho khách hàng Mỹ và EU, với 4 nhà máy phối hợp theo hồ sơ kỹ thuật và tiêu chuẩn kiểm hàng rõ ràng.</p>
+      <div class="mt-8 grid max-w-2xl grid-cols-3 border border-line">
+        {['Tech pack', 'Sample room', 'Inline QC'].map((item) => (
+          <div class="border-r border-line p-3 font-mono text-xs text-soft last:border-r-0">{item}</div>
+        ))}
+      </div>
       <div class="mt-8 flex flex-wrap gap-3">
         <a href="/san-pham/" class="btn btn-primary">Xem nhóm sản phẩm</a>
         <a href="/lien-he/" class="btn btn-plain">Gửi tech pack</a>
       </div>
     </div>
-    <aside class="bg-ink p-5 text-bg md:mt-10">
-      <p class="font-mono text-sm text-accent">SPEC CARD / HAI ANH</p>
+    <aside class="spec-card p-5 text-bg md:m-4">
+      <p class="relative z-10 font-mono text-sm text-accent">SPEC CARD / HAI ANH</p>
       <div class="mt-6 grid grid-cols-2 border border-bg/20">
         {[
           ['2008', 'năm thành lập'],
@@ -55,13 +71,19 @@ const orgJsonLd = {
           </div>
         ))}
       </div>
-      <Image class="mt-5 aspect-[4/3] w-full object-cover" src={heroImage} alt="Bàn kiểm hàng may mặc với áo dệt kim, swatch vải, thước dây và con dấu chất lượng" width={720} loading="eager" />
+      <Image class="relative z-10 mt-5 aspect-[4/3] w-full border border-bg/20 object-cover" src={heroImage} alt="Bàn kiểm hàng may mặc với áo dệt kim, swatch vải, thước dây và con dấu chất lượng" width={720} loading="eager" />
+      <div class="relative z-10 mt-4 grid grid-cols-[auto_1fr] gap-3 border border-bg/20 p-3">
+        <p class="font-mono text-xs text-accent">QC</p>
+        <p class="text-sm text-bg/72">Kiểm thông số, màu, phụ liệu và packing trước khi xuất.</p>
+      </div>
     </aside>
+    </div>
   </section>
 
   <div class="stitch-line" aria-hidden="true"></div>
 
-  <section class="container py-4">
+  <section class="section-slab py-14">
+  <div class="container">
     <SectionHeader eyebrow="Năng lực theo thứ tự chuyền" title="Từ mẫu kỹ thuật đến đóng gói xuất khẩu." lead="Các năng lực được trình bày như một trình tự sản xuất, không phải nhóm icon trang trí." />
     <div class="technical-grid grid-cols-1 md:grid-cols-4">
       {capabilities.map(([title, text], index) => (
@@ -72,6 +94,7 @@ const orgJsonLd = {
         </article>
       ))}
     </div>
+  </div>
   </section>
 
   <div class="stitch-line" aria-hidden="true"></div>
@@ -80,7 +103,7 @@ const orgJsonLd = {
     <SectionHeader eyebrow="Sản phẩm nổi bật" title="Ba nhóm hàng chính cho chuỗi cung ứng xuất khẩu." />
     <div class="grid gap-5 md:grid-cols-3">
       {products.map((product) => (
-        <a href={`/san-pham/${product.id}/`} class="thread-hover block border border-line bg-bg">
+        <a href={`/san-pham/${product.id}/`} class="product-card thread-hover block border border-line">
           {isRemoteImage(product.data.image) ? (
             <img class="aspect-[4/3] w-full object-cover" src={getImageUrl(product.data.image)} alt={product.data.imageAlt} loading="lazy" />
           ) : (
@@ -90,6 +113,7 @@ const orgJsonLd = {
             <p class="font-mono text-xs text-primary">{product.data.category}</p>
             <h3 class="mt-2 text-xl font-semibold">{product.data.name}</h3>
             <p class="mt-3 text-sm text-soft">{product.data.description}</p>
+            <p class="mt-6 font-mono text-xs text-accent">VIEW SEGMENT</p>
           </div>
         </a>
       ))}
@@ -98,7 +122,8 @@ const orgJsonLd = {
 
   <div class="stitch-line" aria-hidden="true"></div>
 
-  <section class="container py-4">
+  <section class="section-slab py-14">
+  <div class="container">
     <SectionHeader eyebrow="Nhà máy" title="4 điểm sản xuất, một chuẩn kiểm hàng." />
     <div class="technical-grid grid-cols-1 md:grid-cols-4">
       {factories.map((factory) => (
@@ -109,17 +134,44 @@ const orgJsonLd = {
         </article>
       ))}
     </div>
+  </div>
   </section>
 
   <div class="stitch-line" aria-hidden="true"></div>
 
-  <section class="container grid gap-6 py-4 md:grid-cols-[0.8fr_1.2fr]">
-    <SectionHeader eyebrow="Đối tác" title="Làm việc theo hồ sơ kỹ thuật, lịch giao hàng và tiêu chuẩn kiểm cuối." />
-    <div class="grid grid-cols-2 border border-line md:grid-cols-4">
-      {['Private Label', 'Importer', 'Retailer', 'Sourcing Office'].map((item) => (
-        <div class="border-b border-r border-line p-5 font-mono text-sm text-soft">{item}</div>
+  <section class="container py-4">
+    <SectionHeader eyebrow="Chứng nhận" title="Sản xuất theo chuẩn quốc tế, có thể kiểm chứng." />
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+      {certifications.map((cert) => (
+        <div class="border border-line p-5">
+          <p class="font-mono text-sm font-semibold text-primary">{cert.data.name}</p>
+          <p class="mt-2 text-sm text-soft">{cert.data.description}</p>
+        </div>
       ))}
     </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow="Dự án tiêu biểu" title="Một số bài toán sản xuất đã triển khai cho khách hàng xuất khẩu." />
+    <div class="grid gap-5 md:grid-cols-3">
+      {caseStudies.map((study) => (
+        <article class="border border-line p-5">
+          <p class="font-mono text-xs text-accent">{study.data.client}</p>
+          <h3 class="mt-3 text-lg font-semibold">{study.data.title}</h3>
+          <p class="mt-3 text-sm text-soft">{study.data.summary}</p>
+          <p class="mt-4 font-mono text-xs text-primary">{study.data.metric}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow="Khách hàng & đối tác" title="Làm việc theo hồ sơ kỹ thuật, lịch giao hàng và tiêu chuẩn kiểm cuối." />
+    <ClientMarquee clients={clients} />
   </section>
 
   <div class="stitch-line" aria-hidden="true"></div>

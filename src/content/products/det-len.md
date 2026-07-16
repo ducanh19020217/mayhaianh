@@ -1,4 +1,5 @@
 ---
+language: "vi"
 name: "Hàng dệt len"
 category: "dệt len"
 description: "Phát triển áo len, chi tiết rib, knit panel và phụ kiện dệt len với kiểm soát gauge, độ xù lông và độ ổn định form."

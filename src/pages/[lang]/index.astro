@@ -1,0 +1,165 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import HomeMediaDeck from '../../components/HomeMediaDeck.astro';
+import ClientMarquee from '../../components/ClientMarquee.astro';
+import { getAssetImage, getImageUrl, isRemoteImage } from '../../lib/images';
+import { filterByLanguage, isLanguage, localized } from '../../lib/i18n';
+import { site } from '../../lib/site';
+
+export function getStaticPaths() {
+  return ['en', 'zh'].map((lang) => ({ params: { lang } }));
+}
+
+const lang = isLanguage(Astro.params.lang) ? Astro.params.lang : 'en';
+const t = localized[lang];
+const products = filterByLanguage(await getCollection('products'), lang);
+const homeBanners = filterByLanguage(await getCollection('homeBanners'), lang).sort((a, b) => a.data.order - b.data.order);
+const homeSetting = filterByLanguage(await getCollection('homeSettings'), lang)[0];
+const certifications = filterByLanguage(await getCollection('certifications'), lang).sort((a, b) => a.data.order - b.data.order);
+const caseStudies = filterByLanguage(await getCollection('caseStudies'), lang).sort((a, b) => a.data.order - b.data.order);
+const clients = filterByLanguage(await getCollection('clients'), lang).sort((a, b) => a.data.order - b.data.order);
+const heroImage = getAssetImage('hero-quality-control.png');
+const capabilities = lang === 'zh'
+  ? [
+      ['针织', '控制缩水、色差和缝制规格的针织产品。'],
+      ['内衣 / 泳装', '高弹面料、松紧带、里布和试穿规格。'],
+      ['毛织', '按针距、纱线成分和版型稳定性开发。'],
+      ['出口后整理', '在线 QC、终检、包装和出货文件。']
+    ]
+  : [
+      ['Knitwear', 'Jersey, pique, interlock, rib and loungewear with shrinkage control.'],
+      ['Intimates / swimwear', 'High-stretch products with elastic, lining and fitting control.'],
+      ['Sweater knit', 'Gauge, yarn composition and shape stability for knit panels.'],
+      ['Export finishing', 'Inline QC, final inspection, packing and shipment documents.']
+    ];
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.name,
+  url: site.url,
+  telephone: site.phone
+};
+const title = lang === 'zh' ? 'Hải Anh Textile | 出口服装制造' : 'Hải Anh Textile | Export garment manufacturing';
+const description = lang === 'zh'
+  ? '面向美国和欧盟市场的针织、内衣、泳装和毛织出口服装制造。'
+  : 'Export garment manufacturer for knitwear, intimates, swimwear and sweater products for US and EU markets.';
+---
+<BaseLayout lang={lang} title={title} description={description} image="/og-default.png" jsonLd={orgJsonLd}>
+  <HomeMediaDeck lang={lang} banners={homeBanners} setting={homeSetting} />
+
+  <section class="container py-10 md:py-16">
+    <div class="hero-panel grid gap-0 md:grid-cols-[1.08fr_0.92fr]">
+      <div class="flex min-h-[560px] flex-col justify-center p-6 md:p-10">
+        <p class="eyebrow">OEM / ODM garment export</p>
+        <h1 class="heading mt-4 max-w-3xl text-5xl md:text-7xl">
+          {lang === 'zh' ? '面向出口品牌的针织、毛织与弹力服装制造。' : 'Export apparel manufacturing across knits, sweaters and stretch products.'}
+        </h1>
+        <p class="mt-6 max-w-2xl text-lg text-soft">
+          {lang === 'zh'
+            ? 'Hải Anh Textile 以技术资料、样衣、在线质检和出口包装为核心，为美国和欧盟客户组织生产。'
+            : 'Hải Anh Textile develops and manufactures knitwear, intimates, swimwear and sweater products with technical files, sampling, inline QC and export packing.'}
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href={t.products} class="btn btn-primary">{lang === 'zh' ? '查看产品' : 'View products'}</a>
+          <a href={t.contact} class="btn btn-plain">{lang === 'zh' ? '发送资料' : 'Send tech pack'}</a>
+        </div>
+      </div>
+      <aside class="spec-card p-5 text-bg md:m-4">
+        <p class="relative z-10 font-mono text-sm text-accent">SPEC CARD / HAI ANH</p>
+        <div class="mt-6 grid grid-cols-2 border border-bg/20">
+          {[
+            ['2008', lang === 'zh' ? '成立' : 'founded'],
+            ['04', lang === 'zh' ? '工厂' : 'factories'],
+            ['US/EU', lang === 'zh' ? '市场' : 'markets'],
+            ['OEM+ODM', lang === 'zh' ? '模式' : 'model']
+          ].map(([value, label]) => (
+            <div class="border-b border-r border-bg/20 p-4 last:border-r-0">
+              <p class="font-mono text-3xl text-accent">{value}</p>
+              <p class="mt-1 text-sm text-bg/70">{label}</p>
+            </div>
+          ))}
+        </div>
+        <Image class="relative z-10 mt-5 aspect-[4/3] w-full border border-bg/20 object-cover" src={heroImage} alt="Garment quality control table with knitwear, swatches and inspection stamp" width={720} loading="eager" />
+      </aside>
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="section-slab py-14">
+    <div class="container">
+      <SectionHeader eyebrow={lang === 'zh' ? '生产能力' : 'Capabilities'} title={lang === 'zh' ? '从技术样衣到出口包装。' : 'From technical sample to export packing.'} />
+      <div class="technical-grid grid-cols-1 md:grid-cols-4">
+        {capabilities.map(([title, text], index) => (
+          <article class="technical-cell min-h-60 p-5">
+            <p class="font-mono text-sm text-primary">{String(index + 1).padStart(2, '0')}</p>
+            <h3 class="mt-10 text-xl font-semibold">{title}</h3>
+            <p class="mt-3 text-sm text-soft">{text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow={lang === 'zh' ? '产品' : 'Products'} title={t.productFilterTitle as string} />
+    <div class="grid gap-5 md:grid-cols-3">
+      {products.map((product) => (
+        <a href={`${t.products}${product.id}/`} class="product-card thread-hover block border border-line">
+          {isRemoteImage(product.data.image) ? (
+            <img class="aspect-[4/3] w-full object-cover" src={getImageUrl(product.data.image)} alt={product.data.imageAlt} loading="lazy" />
+          ) : (
+            <Image class="aspect-[4/3] w-full object-cover" src={getAssetImage(product.data.image)} alt={product.data.imageAlt} width={520} />
+          )}
+          <div class="p-5">
+            <p class="font-mono text-xs text-primary">{product.data.category}</p>
+            <h3 class="mt-2 text-xl font-semibold">{product.data.name}</h3>
+            <p class="mt-3 text-sm text-soft">{product.data.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow={lang === 'zh' ? '认证' : 'Certifications'} title={lang === 'zh' ? '按国际标准生产，可供核实。' : 'Manufacturing to verifiable international standards.'} />
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+      {certifications.map((cert) => (
+        <div class="border border-line p-5">
+          <p class="font-mono text-sm font-semibold text-primary">{cert.data.name}</p>
+          <p class="mt-2 text-sm text-soft">{cert.data.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow={lang === 'zh' ? '案例' : 'Case studies'} title={lang === 'zh' ? '我们为出口客户解决过的一些生产问题。' : 'Production problems we have solved for export customers.'} />
+    <div class="grid gap-5 md:grid-cols-3">
+      {caseStudies.map((study) => (
+        <article class="border border-line p-5">
+          <p class="font-mono text-xs text-accent">{study.data.client}</p>
+          <h3 class="mt-3 text-lg font-semibold">{study.data.title}</h3>
+          <p class="mt-3 text-sm text-soft">{study.data.summary}</p>
+          <p class="mt-4 font-mono text-xs text-primary">{study.data.metric}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <div class="stitch-line" aria-hidden="true"></div>
+
+  <section class="container py-4">
+    <SectionHeader eyebrow={lang === 'zh' ? '客户与合作伙伴' : 'Clients & partners'} title={lang === 'zh' ? '按技术资料、交期与终检标准协作。' : 'Working to technical files, delivery schedules and final inspection standards.'} />
+    <ClientMarquee clients={clients} />
+  </section>
+</BaseLayout>

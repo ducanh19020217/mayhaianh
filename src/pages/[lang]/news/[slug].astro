@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getAssetImage, getImageUrl, isRemoteImage } from '../../../lib/images';
+import { entryLanguage, isLanguage, localized, type Language } from '../../../lib/i18n';
+import { site, breadcrumbJsonLd } from '../../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return ['en', 'zh'].flatMap((lang) => {
+    const exact = posts.filter((post) => entryLanguage(post) === lang);
+    const entries = exact.length > 0 ? exact : posts.filter((post) => entryLanguage(post) === 'vi');
+    return entries.map((post) => ({ params: { lang, slug: post.id }, props: { post, lang } }));
+  });
+}
+
+const { post, lang: routeLang } = Astro.props as { post: CollectionEntry<'blog'>; lang: Language };
+const lang = isLanguage(routeLang) ? routeLang : 'en';
+const { Content } = await render(post);
+const coverImageUrl = getImageUrl(post.data.coverImage);
+const coverImage = isRemoteImage(post.data.coverImage) ? undefined : getAssetImage(post.data.coverImage);
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  image: new URL(coverImage?.src ?? coverImageUrl, site.url).toString(),
+  datePublished: post.data.date.toISOString(),
+  author: { '@type': 'Organization', name: site.name },
+  publisher: { '@type': 'Organization', name: site.name }
+};
+const breadcrumbs = breadcrumbJsonLd([
+  { name: localized[lang].nav[0], url: localized[lang].home },
+  { name: localized[lang].nav[3], url: localized[lang].news },
+  { name: post.data.title, url: `${localized[lang].news}${post.id}/` }
+]);
+const alternates = {
+  vi: `${localized.vi.news}${post.id}/`,
+  en: `${localized.en.news}${post.id}/`,
+  zh: `${localized.zh.news}${post.id}/`
+};
+---
+<BaseLayout lang={lang} title={`${post.data.title} | Hải Anh Textile`} description={post.data.description} image={coverImage?.src ?? coverImageUrl} type="article" jsonLd={[articleJsonLd, breadcrumbs]} alternates={alternates}>
+  <article class="container py-12 md:py-16">
+    <p class="eyebrow">{post.data.date.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US')}</p>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{post.data.title}</h1>
+    <p class="mt-6 max-w-3xl text-lg text-soft">{post.data.description}</p>
+    <a href={localized[lang].news} class="btn btn-plain mt-8">{lang === 'zh' ? '返回新闻' : 'Back to news'}</a>
+    {coverImage ? (
+      <Image class="mt-8 aspect-[16/9] w-full object-cover" src={coverImage} alt={post.data.coverImageAlt} width={1100} loading="eager" />
+    ) : (
+      <img class="mt-8 aspect-[16/9] w-full object-cover" src={coverImageUrl} alt={post.data.coverImageAlt} loading="eager" />
+    )}
+    <div class="stitch-line" aria-hidden="true"></div>
+    <div class="prose max-w-3xl prose-p:text-soft">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

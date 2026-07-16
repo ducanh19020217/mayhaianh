@@ -1,0 +1,33 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { getAssetImage, getImageUrl, isRemoteImage } from '../lib/images';
+
+type Props = {
+  client: CollectionEntry<'clients'>;
+};
+
+const { client } = Astro.props;
+const logo = client.data.logo;
+---
+{client.data.url ? (
+  <a href={client.data.url} rel="noopener noreferrer" target="_blank">
+    {logo ? (
+      isRemoteImage(logo) ? (
+        <img src={getImageUrl(logo)} alt={client.data.name} loading="lazy" />
+      ) : (
+        <Image src={getAssetImage(logo)} alt={client.data.name} width={160} />
+      )
+    ) : (
+      <span class="marquee-item-text">{client.data.name}</span>
+    )}
+  </a>
+) : logo ? (
+  isRemoteImage(logo) ? (
+    <img src={getImageUrl(logo)} alt={client.data.name} loading="lazy" />
+  ) : (
+    <Image src={getAssetImage(logo)} alt={client.data.name} width={160} />
+  )
+) : (
+  <span class="marquee-item-text">{client.data.name}</span>
+)}

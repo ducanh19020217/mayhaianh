@@ -1,4 +1,5 @@
 ---
+language: "vi"
 name: "Đồ lót và đồ bơi"
 category: "đồ lót-đồ bơi"
 description: "Gia công nhóm sản phẩm co giãn cao như đồ lót, đồ bơi và active basics, chú trọng elastic, lining, đường may và kiểm tra fitting."

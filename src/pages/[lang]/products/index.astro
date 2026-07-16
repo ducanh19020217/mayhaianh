@@ -1,0 +1,98 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import { getAssetImage, getImageUrl, isRemoteImage } from '../../../lib/images';
+import { filterByLanguage, isLanguage, localized } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return ['en', 'zh'].map((lang) => ({ params: { lang } }));
+}
+
+const lang = isLanguage(Astro.params.lang) ? Astro.params.lang : 'en';
+const t = localized[lang];
+const products = filterByLanguage(await getCollection('products'), lang);
+const categories = filterByLanguage(await getCollection('productCategories'), lang).sort((a, b) => a.data.order - b.data.order);
+---
+<BaseLayout lang={lang} title={lang === 'zh' ? '产品 | Hải Anh Textile' : 'Products | Hải Anh Textile'} description={lang === 'zh' ? '出口服装产品类别。' : 'Export garment product categories.'}>
+  <section class="container py-12 md:py-16">
+    <p class="eyebrow">{lang === 'zh' ? '产品' : 'Products'}</p>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{t.productTitle}</h1>
+    <a href={`/catalog/hai-anh-textile-catalog-${lang}.pdf`} class="btn btn-plain mt-8" download>{lang === 'zh' ? '下载产品目录（PDF）' : 'Download product catalog (PDF)'}</a>
+  </section>
+  <div class="stitch-line" aria-hidden="true"></div>
+  <section class="container py-4" data-product-browser>
+    <SectionHeader eyebrow={lang === 'zh' ? '类别' : 'Segments'} title={t.productFilterTitle as string} />
+    <div class="filter-panel mb-6 grid gap-4 border border-line p-4 md:grid-cols-[1fr_1.4fr]">
+      <div>
+        <label class="font-mono text-xs text-primary" for="product-search">{t.searchProducts}</label>
+        <input id="product-search" data-product-search class="mt-2 w-full border border-line bg-bg px-3 py-3 text-sm" type="search" autocomplete="off" />
+      </div>
+      <div>
+        <p class="font-mono text-xs text-primary">{t.filterCategory}</p>
+        <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="Filter products by category">
+          <button class="btn btn-primary min-h-10 px-3 py-2 text-sm" type="button" data-category-filter="all" aria-pressed="true">{t.all}</button>
+          {categories.map((category) => (
+            <button class="btn btn-plain min-h-10 px-3 py-2 text-sm" type="button" data-category-filter={category.data.name} aria-pressed="false">{category.data.name}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+    <p class="mb-4 font-mono text-xs text-soft" data-product-count>{products.length} {t.productUnit}</p>
+    <div class="grid gap-5 md:grid-cols-3">
+      {products.map((product) => (
+        <a href={`${t.products}${product.id}/`} class="product-card thread-hover block border border-line" data-product-card data-category={product.data.category.toLocaleLowerCase('vi-VN')} data-search={`${product.data.name} ${product.data.category} ${product.data.description}`.toLocaleLowerCase('vi-VN')}>
+          {isRemoteImage(product.data.image) ? (
+            <img class="aspect-[4/3] w-full object-cover" src={getImageUrl(product.data.image)} alt={product.data.imageAlt} loading="lazy" />
+          ) : (
+            <Image class="aspect-[4/3] w-full object-cover" src={getAssetImage(product.data.image)} alt={product.data.imageAlt} width={580} />
+          )}
+          <div class="p-5">
+            <p class="font-mono text-xs text-primary">{product.data.category}</p>
+            <h2 class="mt-2 text-xl font-semibold">{product.data.name}</h2>
+            <p class="mt-3 text-sm text-soft">{product.data.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+    <p class="hidden border border-line p-5 text-soft" data-empty-state>{t.noProducts}</p>
+  </section>
+  <script>
+    const browser = document.querySelector('[data-product-browser]');
+    const searchInput = browser?.querySelector<HTMLInputElement>('[data-product-search]');
+    const filterButtons = Array.from(browser?.querySelectorAll('[data-category-filter]') ?? []);
+    const cards = Array.from(browser?.querySelectorAll('[data-product-card]') ?? []);
+    const count = browser?.querySelector('[data-product-count]');
+    const emptyState = browser?.querySelector('[data-empty-state]');
+    let activeCategory = 'all';
+    function applyFilters() {
+      const query = searchInput?.value.trim().toLocaleLowerCase('vi-VN') ?? '';
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const category = card.getAttribute('data-category') ?? '';
+        const haystack = card.getAttribute('data-search') ?? '';
+        const categoryMatch = activeCategory === 'all' || category === activeCategory.toLocaleLowerCase('vi-VN');
+        const searchMatch = !query || haystack.includes(query);
+        const isVisible = categoryMatch && searchMatch;
+        card.classList.toggle('hidden', !isVisible);
+        if (isVisible) visibleCount += 1;
+      });
+      if (count) count.textContent = `${visibleCount} ${document.documentElement.lang === 'zh-CN' ? '个产品' : 'products'}`;
+      emptyState?.classList.toggle('hidden', visibleCount !== 0);
+    }
+    filterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        activeCategory = button.getAttribute('data-category-filter') ?? 'all';
+        filterButtons.forEach((item) => {
+          const isActive = item === button;
+          item.setAttribute('aria-pressed', String(isActive));
+          item.classList.toggle('btn-primary', isActive);
+          item.classList.toggle('btn-plain', !isActive);
+        });
+        applyFilters();
+      });
+    });
+    searchInput?.addEventListener('input', applyFilters);
+  </script>
+</BaseLayout>

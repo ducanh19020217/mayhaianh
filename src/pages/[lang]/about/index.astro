@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import { isLanguage } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return ['en', 'zh'].map((lang) => ({ params: { lang } }));
+}
+
+const lang = isLanguage(Astro.params.lang) ? Astro.params.lang : 'en';
+const entries = await getCollection('about');
+const bySection = (section: 'history' | 'vision' | 'organization') =>
+  entries.find((item) => item.data.section === section && item.data.language === lang) ??
+  entries.find((item) => item.data.section === section && item.data.language === 'vi');
+const cards = [
+  { eyebrow: '01', href: `/${lang}/about/development/`, entry: bySection('history') },
+  { eyebrow: '02', href: `/${lang}/about/purpose/`, entry: bySection('vision') },
+  { eyebrow: '03', href: `/${lang}/about/organization/`, entry: bySection('organization') }
+];
+---
+<BaseLayout lang={lang} title={lang === 'zh' ? '关于我们 | Hải Anh Textile' : 'About | Hải Anh Textile'} description={lang === 'zh' ? 'Hải Anh Textile 出口服装制造能力介绍。' : 'Overview of Hải Anh Textile export garment manufacturing capabilities.'}>
+  <section class="container py-12 md:py-16">
+    <p class="eyebrow">{lang === 'zh' ? '关于我们' : 'About'}</p>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{lang === 'zh' ? '以技术资料和质检为核心的出口生产系统。' : 'An export production system built around technical files and quality control.'}</h1>
+  </section>
+  <div class="stitch-line" aria-hidden="true"></div>
+  <section class="container grid gap-8 py-4 md:grid-cols-3">
+    {cards.map(({ eyebrow, href, entry }) => entry && (
+      <a href={href} class="product-card border border-line p-5 transition hover:border-primary">
+        <SectionHeader eyebrow={eyebrow} title={entry.data.title} />
+        <p class="text-soft">{entry.data.summary}</p>
+      </a>
+    ))}
+  </section>
+</BaseLayout>

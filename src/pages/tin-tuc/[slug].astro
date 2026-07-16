@@ -3,11 +3,12 @@ import { Image } from 'astro:assets';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAssetImage, getImageUrl, isRemoteImage } from '../../lib/images';
-import { site } from '../../lib/site';
+import { site, breadcrumbJsonLd } from '../../lib/site';
+import { entryLanguage, localized } from '../../lib/i18n';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  return posts.filter((post) => entryLanguage(post) === 'vi').map((post) => ({ params: { slug: post.id }, props: { post } }));
 }
 
 const { post } = Astro.props as { post: CollectionEntry<'blog'> };
@@ -24,8 +25,18 @@ const articleJsonLd = {
   author: { '@type': 'Organization', name: site.name },
   publisher: { '@type': 'Organization', name: site.name }
 };
+const breadcrumbs = breadcrumbJsonLd([
+  { name: 'Trang chủ', url: localized.vi.home },
+  { name: 'Tin tức', url: localized.vi.news },
+  { name: post.data.title, url: `${localized.vi.news}${post.id}/` }
+]);
+const alternates = {
+  vi: `${localized.vi.news}${post.id}/`,
+  en: `${localized.en.news}${post.id}/`,
+  zh: `${localized.zh.news}${post.id}/`
+};
 ---
-<BaseLayout title={`${post.data.title} | Hải Anh Textile`} description={post.data.description} image={coverImage?.src ?? coverImageUrl} type="article" jsonLd={articleJsonLd}>
+<BaseLayout lang="vi" title={`${post.data.title} | Hải Anh Textile`} description={post.data.description} image={coverImage?.src ?? coverImageUrl} type="article" jsonLd={[articleJsonLd, breadcrumbs]} alternates={alternates}>
   <article class="container py-12 md:py-16">
     <p class="eyebrow">{post.data.date.toLocaleDateString('vi-VN')}</p>
     <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{post.data.title}</h1>

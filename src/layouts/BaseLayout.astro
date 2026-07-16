@@ -1,6 +1,8 @@
 ---
+import { getCollection } from 'astro:content';
 import '../styles/global.css';
 import { site, defaultOgImage } from '../lib/site';
+import { languages, languageFlags, localized, detectAlternates, filterByLanguage, type Language } from '../lib/i18n';
 
 type Props = {
   title?: string;
@@ -9,6 +11,8 @@ type Props = {
   type?: 'website' | 'article' | 'product';
   canonical?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  lang?: Language;
+  alternates?: Partial<Record<Language, string>>;
 };
 
 const {
@@ -17,25 +21,46 @@ const {
   image = defaultOgImage,
   type = 'website',
   canonical = new URL(Astro.url.pathname, site.url).toString(),
-  jsonLd
+  jsonLd,
+  lang = 'vi',
+  alternates
 } = Astro.props;
 const absoluteImage = new URL(image, site.url).toString();
+const t = localized[lang];
+const resolvedAlternates = alternates ?? detectAlternates(Astro.url.pathname);
+const gaId = import.meta.env.PUBLIC_GA_ID as string | undefined;
+const gscVerification = import.meta.env.PUBLIC_GSC_VERIFICATION as string | undefined;
 const nav = [
-  ['Trang chủ', '/'],
-  ['Giới thiệu', '/gioi-thieu/'],
-  ['Sản phẩm', '/san-pham/'],
-  ['Tin tức', '/tin-tuc/'],
-  ['Liên hệ', '/lien-he/']
+  [t.nav[0], t.home],
+  [t.nav[1], t.about],
+  [t.nav[2], t.products],
+  [t.nav[3], t.news],
+  [t.nav[4], t.contact]
 ];
+const currentPath = Astro.url.pathname;
+function isActiveNav(href: string) {
+  if (href === '/' || href === '/en/' || href === '/zh/') {
+    return currentPath === href;
+  }
+  return currentPath === href || currentPath.startsWith(href);
+}
+const factories = filterByLanguage(await getCollection('factories'), lang).sort((a, b) => a.data.order - b.data.order);
+const factoriesLabel = lang === 'zh' ? '工厂' : lang === 'en' ? 'Factories' : 'Nhà máy';
+const copyrightYear = new Date().getFullYear();
 ---
 <!doctype html>
-<html lang="vi">
+<html lang={lang === 'zh' ? 'zh-CN' : lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {resolvedAlternates && Object.entries(resolvedAlternates).map(([hrefLang, href]) => (
+      <link rel="alternate" hreflang={hrefLang} href={new URL(href, site.url).toString()} />
+    ))}
+    {resolvedAlternates && <link rel="alternate" hreflang="x-default" href={new URL(resolvedAlternates.vi ?? Object.values(resolvedAlternates)[0], site.url).toString()} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={absoluteImage} />
@@ -45,34 +70,88 @@ const nav = [
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={absoluteImage} />
+    {gscVerification && <meta name="google-site-verification" content={gscVerification} />}
     {jsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {gaId && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script is:inline define:vars={{ gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
   </head>
   <body>
-    <header class="border-b border-line bg-bg/95">
+    <header class="site-header">
       <div class="container flex min-h-16 items-center justify-between gap-6 py-3">
-        <a href="/" class="font-mono text-sm font-semibold text-primary">HAI ANH / EXPORT</a>
+        <a href={t.home} class="brand-logo" aria-label="Hải Anh Textile">
+          <img src="/logo-ha.svg" alt="Hải Anh Textile" width="132" height="65" />
+        </a>
         <nav aria-label="Điều hướng chính" class="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm font-semibold">
-          {nav.map(([label, href]) => <a class="hover:text-primary" href={href}>{label}</a>)}
+          {nav.map(([label, href]) => {
+            const active = isActiveNav(href);
+            return (
+              <a class={active ? 'nav-link nav-link-active' : 'nav-link'} aria-current={active ? 'page' : undefined} href={href}>
+                {label}
+              </a>
+            );
+          })}
+          <span class="hidden h-5 border-l border-line md:inline-block"></span>
+          {Object.entries(languages).map(([code, label]) => (
+            <a
+              class={code === lang ? 'text-lg leading-none opacity-100' : 'text-lg leading-none opacity-50 hover:opacity-100'}
+              href={localized[code as Language].home}
+              title={label}
+              aria-label={label}
+              aria-current={code === lang ? 'true' : undefined}
+            >
+              {languageFlags[code as Language]}
+            </a>
+          ))}
         </nav>
       </div>
     </header>
     <main>
       <slot />
     </main>
+    <div class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+      <a href={`tel:${site.phone.replace(/\s+/g, '')}`} class="btn btn-primary shadow-lg">{t.callNow}</a>
+      <a href={t.contact} class="btn btn-plain bg-bg shadow-lg">{t.requestQuote}</a>
+    </div>
     <footer class="mt-20 bg-ink text-bg">
       <div class="container grid gap-8 py-10 md:grid-cols-[1.5fr_1fr_1fr]">
         <div>
           <p class="font-mono text-sm text-accent">HAI ANH TEXTILE</p>
+          <p class="mt-2 text-sm font-semibold text-bg">{site.legalName}</p>
           <p class="mt-3 max-w-xl text-sm text-bg/75">Năng lực may xuất khẩu dệt kim, đồ lót, đồ bơi và dệt len. Site tĩnh, không lưu dữ liệu người dùng trên máy chủ riêng.</p>
         </div>
         <div class="text-sm text-bg/75">
           <p class="font-semibold text-bg">Liên hệ</p>
-          <p>{site.phone}</p>
+          {site.phones.map((phone) => <p>{phone}</p>)}
           <p>{site.email}</p>
         </div>
         <div class="text-sm text-bg/75">
           <p class="font-semibold text-bg">Thị trường</p>
           <p>Mỹ / EU / đơn hàng OEM, ODM có kiểm soát chất lượng.</p>
+        </div>
+      </div>
+      <div class="border-t border-bg/15">
+        <div class="container grid gap-4 py-8 sm:grid-cols-2 md:grid-cols-4">
+          {factories.map((factory) => (
+            <div class="text-sm text-bg/75">
+              <p class="font-mono text-xs text-accent">{factoriesLabel} {String(factory.data.order).padStart(2, '0')}</p>
+              <p class="mt-1 font-semibold text-bg">{factory.data.name}</p>
+              <p class="mt-1">{factory.data.address}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="border-t border-bg/15">
+        <div class="container py-5 text-center text-xs text-bg/60">
+          Copyright {copyrightYear} © {site.copyrightName}
         </div>
       </div>
     </footer>

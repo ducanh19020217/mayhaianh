@@ -19,6 +19,44 @@ public_folder: "src/assets"
 locale: "vi"
 
 collections:
+  - name: "home_banners"
+    label: "Banner trang chủ"
+    folder: "src/content/home-banners"
+    create: true
+    identifier_field: "title"
+    slug: "{{slug}}"
+    fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
+      - { label: "Tiêu đề banner", name: "title", widget: "string" }
+      - { label: "Mô tả banner", name: "description", widget: "text" }
+      - { label: "Ảnh banner", name: "image", widget: "image" }
+      - { label: "Alt text ảnh", name: "imageAlt", widget: "string" }
+      - { label: "Thứ tự", name: "order", widget: "number", value_type: "int" }
+  - name: "home_settings"
+    label: "Cấu hình trang chủ"
+    folder: "src/content/home-settings"
+    create: true
+    identifier_field: "videoTitle"
+    slug: "{{slug}}"
+    fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
+      - { label: "Link YouTube", name: "videoUrl", widget: "string" }
+      - { label: "Tiêu đề video", name: "videoTitle", widget: "string" }
+      - { label: "Mô tả video", name: "videoDescription", widget: "text" }
   - name: "product_categories"
     label: "Danh mục sản phẩm"
     folder: "src/content/product-categories"
@@ -26,6 +64,14 @@ collections:
     identifier_field: "name"
     slug: "{{slug}}"
     fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
       - { label: "Tên danh mục", name: "name", widget: "string" }
       - { label: "Mô tả", name: "description", widget: "text" }
       - { label: "Thứ tự", name: "order", widget: "number", value_type: "int" }
@@ -36,6 +82,14 @@ collections:
     identifier_field: "name"
     slug: "{{slug}}"
     fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
       - { label: "Tên sản phẩm", name: "name", widget: "string" }
       - label: "Danh mục"
         name: "category"
@@ -47,14 +101,24 @@ collections:
       - { label: "Meta description", name: "description", widget: "text" }
       - { label: "Ảnh", name: "image", widget: "image" }
       - { label: "Alt text ảnh", name: "imageAlt", widget: "string" }
+      - { label: "Thư viện ảnh (tùy chọn)", name: "gallery", widget: "list", field: { label: "Ảnh", name: "image", widget: "image" }, required: false }
       - { label: "SEO Checker", name: "seoCheck", widget: "seo_checker", required: false }
       - { label: "Nội dung", name: "body", widget: "markdown" }
   - name: "blog"
     label: "Tin tức"
     folder: "src/content/blog"
     create: true
+    identifier_field: "title"
     slug: "{{slug}}"
     fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
       - { label: "Tiêu đề", name: "title", widget: "string" }
       - { label: "Ngày", name: "date", widget: "datetime" }
       - { label: "Meta description", name: "description", widget: "text" }
@@ -68,8 +132,99 @@ collections:
     label: "Nhà máy"
     folder: "src/content/factories"
     create: true
+    identifier_field: "name"
     slug: "{{slug}}"
     fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
       - { label: "Tên nhà máy", name: "name", widget: "string" }
       - { label: "Địa chỉ", name: "address", widget: "string" }
+      - { label: "Thứ tự", name: "order", widget: "number", value_type: "int" }
+  - name: "about"
+    label: "Giới thiệu công ty"
+    folder: "src/content/about"
+    create: true
+    identifier_field: "title"
+    slug: "{{section}}-{{language}}"
+    fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
+      - label: "Mục"
+        name: "section"
+        widget: "select"
+        options:
+          - { label: "Lịch sử phát triển", value: "history" }
+          - { label: "Tầm nhìn & Sứ mệnh", value: "vision" }
+          - { label: "Cơ cấu tổ chức", value: "organization" }
+      - { label: "Tiêu đề", name: "title", widget: "string" }
+      - { label: "Mô tả ngắn", name: "summary", widget: "text" }
+      - { label: "Nội dung", name: "body", widget: "markdown" }
+  - name: "certifications"
+    label: "Chứng nhận"
+    folder: "src/content/certifications"
+    create: true
+    identifier_field: "name"
+    slug: "{{slug}}"
+    fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
+      - { label: "Tên chứng nhận", name: "name", widget: "string" }
+      - { label: "Mô tả", name: "description", widget: "text" }
+      - { label: "Thứ tự", name: "order", widget: "number", value_type: "int" }
+  - name: "case_studies"
+    label: "Dự án tiêu biểu"
+    folder: "src/content/case-studies"
+    create: true
+    identifier_field: "title"
+    slug: "{{slug}}"
+    fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
+      - { label: "Tiêu đề", name: "title", widget: "string" }
+      - { label: "Khách hàng", name: "client", widget: "string" }
+      - { label: "Mô tả", name: "summary", widget: "text" }
+      - { label: "Kết quả", name: "metric", widget: "string" }
+      - { label: "Thứ tự", name: "order", widget: "number", value_type: "int" }
+  - name: "clients"
+    label: "Khách hàng & đối tác"
+    folder: "src/content/clients"
+    create: true
+    identifier_field: "name"
+    slug: "{{slug}}"
+    fields:
+      - label: "Ngôn ngữ"
+        name: "language"
+        widget: "select"
+        default: "vi"
+        options:
+          - { label: "Tiếng Việt", value: "vi" }
+          - { label: "English", value: "en" }
+          - { label: "中文", value: "zh" }
+      - { label: "Tên khách hàng / đối tác", name: "name", widget: "string" }
+      - { label: "Logo", name: "logo", widget: "image", required: false, hint: "Để trống nếu chưa có logo, hệ thống sẽ hiển thị tên dạng chữ." }
+      - { label: "Website (tùy chọn)", name: "url", widget: "string", required: false }
       - { label: "Thứ tự", name: "order", widget: "number", value_type: "int" }

@@ -14,6 +14,8 @@ npm run build
 
 - Sản phẩm: `src/content/products/*.md`
 - Danh mục sản phẩm: `src/content/product-categories/*.md`
+- Banner trang chủ: `src/content/home-banners/*.md`
+- Cấu hình trang chủ/video YouTube: `src/content/home-settings/*.md`
 - Tin tức: `src/content/blog/*.md`
 - Nhà máy: `src/content/factories/*.md`
 
@@ -32,6 +34,20 @@ npm run dev:cms
 Sau đó mở `http://localhost:4321/admin/`. Decap sẽ dùng backend `proxy` qua `decap-server` để ghi trực tiếp vào các file Markdown trong repo, không cần đăng nhập GitHub.
 
 Người soạn bài có thể vào collection "Danh mục sản phẩm" để thêm danh mục mới. Khi tạo hoặc sửa sản phẩm, field "Danh mục" sẽ lấy dữ liệu từ collection này.
+
+Trang chủ:
+
+- Collection "Banner trang chủ" quản lý ảnh trượt, tiêu đề, mô tả và thứ tự.
+- Collection "Cấu hình trang chủ" quản lý link YouTube và nội dung cạnh video.
+- Banner có hiệu ứng zoom chậm; người dùng bật giảm chuyển động trong hệ điều hành sẽ không thấy animation.
+
+Đa ngôn ngữ:
+
+- Chọn field `Ngôn ngữ` khi tạo danh mục, sản phẩm, bài viết hoặc nhà máy.
+- `vi` hiển thị ở `/`, `/san-pham/`, `/tin-tuc/`.
+- `en` hiển thị ở `/en/`, `/en/products/`, `/en/news/`.
+- `zh` hiển thị ở `/zh/`, `/zh/products/`, `/zh/news/`.
+- Nếu chưa có nội dung tiếng Anh/Trung, site tạm fallback sang nội dung tiếng Việt để không bị trống.
 
 1. Thay `repo: your-org/may-hai-anh` bằng repo GitHub thật.
 2. Đổi block `backend` trong `public/admin/config.yml` từ `name: proxy` sang block GitHub đang được comment.

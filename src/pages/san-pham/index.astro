@@ -4,21 +4,25 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import { getAssetImage, getImageUrl, isRemoteImage } from '../../lib/images';
+import { filterByLanguage, localized } from '../../lib/i18n';
 
-const products = await getCollection('products');
-const categories = (await getCollection('productCategories')).sort((a, b) => a.data.order - b.data.order);
+const lang = 'vi';
+const t = localized[lang];
+const products = filterByLanguage(await getCollection('products'), lang);
+const categories = filterByLanguage(await getCollection('productCategories'), lang).sort((a, b) => a.data.order - b.data.order);
 ---
-<BaseLayout title="Sản phẩm may mặc xuất khẩu" description="Danh sách nhóm sản phẩm dệt kim, đồ lót, đồ bơi và dệt len của Hải Anh Textile.">
+<BaseLayout lang={lang} title="Sản phẩm may mặc xuất khẩu" description="Danh sách nhóm sản phẩm dệt kim, đồ lót, đồ bơi và dệt len của Hải Anh Textile.">
   <section class="container py-12 md:py-16">
     <p class="eyebrow">Sản phẩm</p>
-    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">Nhóm sản phẩm được tổ chức theo năng lực vật liệu và chuyền may.</h1>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{t.productTitle}</h1>
+    <a href="/catalog/hai-anh-textile-catalog-vi.pdf" class="btn btn-plain mt-8" download>Tải catalog sản phẩm (PDF)</a>
   </section>
   <div class="stitch-line" aria-hidden="true"></div>
   <section class="container py-4" data-product-browser>
-    <SectionHeader eyebrow="Danh mục" title="Tìm và lọc theo nhóm sản phẩm." />
-    <div class="mb-6 grid gap-4 border border-line p-4 md:grid-cols-[1fr_1.4fr]">
+    <SectionHeader eyebrow="Danh mục" title={t.productFilterTitle as string} />
+    <div class="filter-panel mb-6 grid gap-4 border border-line p-4 md:grid-cols-[1fr_1.4fr]">
       <div>
-        <label class="font-mono text-xs text-primary" for="product-search">Tìm theo tên / tiêu đề</label>
+        <label class="font-mono text-xs text-primary" for="product-search">{t.searchProducts}</label>
         <input
           id="product-search"
           data-product-search
@@ -29,9 +33,9 @@ const categories = (await getCollection('productCategories')).sort((a, b) => a.d
         />
       </div>
       <div>
-        <p class="font-mono text-xs text-primary">Lọc theo danh mục</p>
+        <p class="font-mono text-xs text-primary">{t.filterCategory}</p>
         <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="Lọc sản phẩm theo danh mục">
-          <button class="btn btn-primary min-h-10 px-3 py-2 text-sm" type="button" data-category-filter="all" aria-pressed="true">Tất cả</button>
+          <button class="btn btn-primary min-h-10 px-3 py-2 text-sm" type="button" data-category-filter="all" aria-pressed="true">{t.all}</button>
           {categories.map((category) => (
             <button class="btn btn-plain min-h-10 px-3 py-2 text-sm" type="button" data-category-filter={category.data.name} aria-pressed="false">
               {category.data.name}
@@ -40,12 +44,12 @@ const categories = (await getCollection('productCategories')).sort((a, b) => a.d
         </div>
       </div>
     </div>
-    <p class="mb-4 font-mono text-xs text-soft" data-product-count>{products.length} sản phẩm</p>
+    <p class="mb-4 font-mono text-xs text-soft" data-product-count>{products.length} {t.productUnit}</p>
     <div class="grid gap-5 md:grid-cols-3" data-product-grid>
       {products.map((product) => (
         <a
           href={`/san-pham/${product.id}/`}
-          class="thread-hover block border border-line"
+        class="product-card thread-hover block border border-line"
           data-product-card
           data-category={product.data.category.toLocaleLowerCase('vi-VN')}
           data-search={`${product.data.name} ${product.data.category} ${product.data.description}`.toLocaleLowerCase('vi-VN')}
@@ -59,11 +63,12 @@ const categories = (await getCollection('productCategories')).sort((a, b) => a.d
             <p class="font-mono text-xs text-primary">{product.data.category}</p>
             <h2 class="mt-2 text-xl font-semibold">{product.data.name}</h2>
             <p class="mt-3 text-sm text-soft">{product.data.description}</p>
+            <p class="mt-6 font-mono text-xs text-accent">PRODUCT SPEC</p>
           </div>
         </a>
       ))}
     </div>
-    <p class="hidden border border-line p-5 text-soft" data-empty-state>Không có sản phẩm phù hợp.</p>
+    <p class="hidden border border-line p-5 text-soft" data-empty-state>{t.noProducts}</p>
   </section>
   <script>
     const browser = document.querySelector('[data-product-browser]');
@@ -97,7 +102,7 @@ const categories = (await getCollection('productCategories')).sort((a, b) => a.d
         if (isVisible) visibleCount += 1;
       });
 
-      if (count) count.textContent = `${visibleCount} sản phẩm`;
+      if (count) count.textContent = `${visibleCount} ${document.documentElement.lang === 'vi' ? 'sản phẩm' : document.documentElement.lang === 'zh-CN' ? '个产品' : 'products'}`;
       emptyState?.classList.toggle('hidden', visibleCount !== 0);
     }
 

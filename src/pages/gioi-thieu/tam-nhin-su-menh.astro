@@ -1,0 +1,30 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { localized, aboutSectionPaths } from '../../lib/i18n';
+import { breadcrumbJsonLd } from '../../lib/site';
+
+const entries = await getCollection('about');
+const entry = entries.find((item) => item.data.section === 'vision' && item.data.language === 'vi');
+if (!entry) throw new Error('Missing about/vision-vi content entry');
+const { Content } = await render(entry);
+const breadcrumbs = breadcrumbJsonLd([
+  { name: 'Trang chủ', url: localized.vi.home },
+  { name: 'Giới thiệu', url: localized.vi.about },
+  { name: entry.data.title, url: aboutSectionPaths.vision.vi }
+]);
+---
+<BaseLayout title={`${entry.data.title} | Hải Anh Textile`} description={entry.data.summary} jsonLd={breadcrumbs} alternates={aboutSectionPaths.vision}>
+  <section class="container py-12 md:py-16">
+    <p class="eyebrow">Giới thiệu</p>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{entry.data.title}</h1>
+    <p class="mt-6 max-w-3xl text-lg text-soft">{entry.data.summary}</p>
+    <a href="/gioi-thieu/" class="btn btn-plain mt-8">Về trang giới thiệu</a>
+  </section>
+  <div class="stitch-line" aria-hidden="true"></div>
+  <section class="container py-4">
+    <div class="prose max-w-3xl prose-p:text-soft">
+      <Content />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,4 +1,5 @@
 ---
+language: "vi"
 title: "Hồ sơ kỹ thuật giúp nhà máy may xuất khẩu chạy ổn định"
 date: 2026-06-18
 description: "Hồ sơ kỹ thuật rõ ràng giúp giảm lỗi khi triển khai đơn hàng may xuất khẩu, từ BOM, rập, thông số đến packing."

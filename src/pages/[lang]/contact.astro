@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { isLanguage } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return ['en', 'zh'].map((lang) => ({ params: { lang } }));
+}
+
+const lang = isLanguage(Astro.params.lang) ? Astro.params.lang : 'en';
+---
+<BaseLayout lang={lang} title={lang === 'zh' ? '联系 | Hải Anh Textile' : 'Contact | Hải Anh Textile'} description={lang === 'zh' ? '发送出口服装生产需求。' : 'Send export garment production requirements.'}>
+  <section class="container grid gap-10 py-12 md:grid-cols-[0.9fr_1.1fr] md:py-16">
+    <div>
+      <p class="eyebrow">{lang === 'zh' ? '联系' : 'Contact'}</p>
+      <h1 class="heading mt-4 text-5xl md:text-7xl">{lang === 'zh' ? '发送 tech pack 或询价需求。' : 'Send a tech pack or sourcing request.'}</h1>
+      <p class="mt-6 text-soft">{lang === 'zh' ? '表单使用 Formspree，不在本站保存用户数据。' : 'The form uses Formspree and does not store user data on this site.'}</p>
+    </div>
+    <form class="filter-panel border border-line p-5" action="https://formspree.io/f/your-form-id" method="POST">
+      <input type="text" name="_gotcha" class="hidden" tabindex="-1" autocomplete="off" />
+      <label class="block text-sm font-semibold" for="name">{lang === 'zh' ? '姓名' : 'Name'}</label>
+      <input class="mt-2 w-full border border-line bg-bg px-3 py-3" id="name" name="name" required />
+      <label class="mt-4 block text-sm font-semibold" for="email">Email</label>
+      <input class="mt-2 w-full border border-line bg-bg px-3 py-3" id="email" name="email" type="email" required />
+      <label class="mt-4 block text-sm font-semibold" for="message">{lang === 'zh' ? '内容' : 'Message'}</label>
+      <textarea class="mt-2 min-h-40 w-full border border-line bg-bg px-3 py-3" id="message" name="message" required></textarea>
+      <button class="btn btn-primary mt-5" type="submit">{lang === 'zh' ? '发送' : 'Send'}</button>
+    </form>
+  </section>
+</BaseLayout>

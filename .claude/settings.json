@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:haianhtex.com)",
+      "Bash(npx astro *)",
+      "Bash(command -v nvm)",
+      "Read(//home/ducanh/.nvm/versions/node/**)",
+      "Bash(python3 -c \"import reportlab\")",
+      "Bash(node -e \"require\\('puppeteer'\\)\")",
+      "Bash(pdfinfo /media/veracrypt8/PersonalProject/MayHaiAnh/public/catalog/hai-anh-textile-catalog-vi.pdf)"
+    ]
+  }
+}

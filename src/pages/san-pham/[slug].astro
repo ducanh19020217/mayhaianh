@@ -3,28 +3,46 @@ import { Image } from 'astro:assets';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAssetImage, getImageUrl, isRemoteImage } from '../../lib/images';
-import { site } from '../../lib/site';
+import { site, breadcrumbJsonLd } from '../../lib/site';
+import { entryLanguage, localized } from '../../lib/i18n';
 
 export async function getStaticPaths() {
   const products = await getCollection('products');
-  return products.map((product) => ({ params: { slug: product.id }, props: { product } }));
+  return products.filter((product) => entryLanguage(product) === 'vi').map((product) => ({ params: { slug: product.id }, props: { product } }));
 }
 
 const { product } = Astro.props as { product: CollectionEntry<'products'> };
 const { Content } = await render(product);
 const productImageUrl = getImageUrl(product.data.image);
 const productImage = isRemoteImage(product.data.image) ? undefined : getAssetImage(product.data.image);
+const galleryImages = product.data.gallery.map((source) => ({
+  url: getImageUrl(source),
+  asset: isRemoteImage(source) ? undefined : getAssetImage(source)
+}));
 const productJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
   name: product.data.name,
   description: product.data.description,
   category: product.data.category,
-  image: new URL(productImage?.src ?? productImageUrl, site.url).toString(),
+  image: [
+    new URL(productImage?.src ?? productImageUrl, site.url).toString(),
+    ...galleryImages.map((img) => new URL(img.asset?.src ?? img.url, site.url).toString())
+  ],
   brand: { '@type': 'Brand', name: site.name }
 };
+const breadcrumbs = breadcrumbJsonLd([
+  { name: 'Trang chủ', url: localized.vi.home },
+  { name: 'Sản phẩm', url: localized.vi.products },
+  { name: product.data.name, url: `${localized.vi.products}${product.id}/` }
+]);
+const alternates = {
+  vi: `${localized.vi.products}${product.id}/`,
+  en: `${localized.en.products}${product.id}/`,
+  zh: `${localized.zh.products}${product.id}/`
+};
 ---
-<BaseLayout title={`${product.data.name} | Hải Anh Textile`} description={product.data.description} image={productImage?.src ?? productImageUrl} type="product" jsonLd={productJsonLd}>
+<BaseLayout lang="vi" title={`${product.data.name} | Hải Anh Textile`} description={product.data.description} image={productImage?.src ?? productImageUrl} type="product" jsonLd={[productJsonLd, breadcrumbs]} alternates={alternates}>
   <article class="container grid gap-10 py-12 md:grid-cols-[0.9fr_1.1fr] md:py-16">
     <div>
       <p class="eyebrow">{product.data.category}</p>
@@ -37,6 +55,17 @@ const productJsonLd = {
       <img class="aspect-[4/3] w-full object-cover" src={productImageUrl} alt={product.data.imageAlt} loading="eager" />
     )}
   </article>
+  {galleryImages.length > 0 && (
+    <section class="container grid grid-cols-2 gap-4 py-4 md:grid-cols-4">
+      {galleryImages.map((img, index) =>
+        img.asset ? (
+          <Image class="aspect-square w-full object-cover" src={img.asset} alt={`${product.data.imageAlt} ${index + 2}`} width={400} loading="lazy" />
+        ) : (
+          <img class="aspect-square w-full object-cover" src={img.url} alt={`${product.data.imageAlt} ${index + 2}`} loading="lazy" />
+        )
+      )}
+    </section>
+  )}
   <div class="stitch-line" aria-hidden="true"></div>
   <section class="container prose max-w-3xl py-4 prose-p:text-soft">
     <Content />

@@ -1,0 +1,97 @@
+---
+import { Image } from 'astro:assets';
+import { getAssetImage, getImageUrl, isRemoteImage } from '../lib/images';
+import { getYouTubeEmbedUrl } from '../lib/video';
+
+type Banner = {
+  data: {
+    title: string;
+    description: string;
+    image: string;
+    imageAlt: string;
+  };
+};
+
+type Setting = {
+  data: {
+    videoUrl: string;
+    videoTitle: string;
+    videoDescription: string;
+  };
+};
+
+const { banners = [], setting, lang = 'vi' } = Astro.props as {
+  banners: Banner[];
+  setting?: Setting;
+  lang?: 'vi' | 'en' | 'zh';
+};
+const activeBanners = banners.length > 0 ? banners : [];
+const videoEmbed = setting ? getYouTubeEmbedUrl(setting.data.videoUrl) : '';
+---
+<section class="container py-10 md:py-16">
+  <div class="media-deck grid gap-5 md:grid-cols-[1.35fr_0.65fr]">
+    <div class="banner-slider" data-banner-slider>
+      {activeBanners.map((banner, index) => (
+        <article class={index === 0 ? 'banner-slide banner-slide-active' : 'banner-slide'} data-banner-slide>
+          {isRemoteImage(banner.data.image) ? (
+            <img src={getImageUrl(banner.data.image)} alt={banner.data.imageAlt} loading={index === 0 ? 'eager' : 'lazy'} />
+          ) : (
+            <Image src={getAssetImage(banner.data.image)} alt={banner.data.imageAlt} width={980} loading={index === 0 ? 'eager' : 'lazy'} />
+          )}
+          <div class="banner-caption">
+            <p class="font-mono text-xs text-accent">{String(index + 1).padStart(2, '0')} / {String(activeBanners.length).padStart(2, '0')}</p>
+            <h2 class="heading mt-3 text-3xl md:text-5xl">{banner.data.title}</h2>
+            <p class="mt-4 max-w-2xl text-sm text-bg/80 md:text-base">{banner.data.description}</p>
+          </div>
+        </article>
+      ))}
+      <div class="banner-controls" aria-label={lang === 'zh' ? '横幅控制' : 'Banner controls'}>
+        {activeBanners.map((_, index) => (
+          <button type="button" data-banner-dot aria-label={`Banner ${index + 1}`} aria-pressed={index === 0 ? 'true' : 'false'}></button>
+        ))}
+      </div>
+    </div>
+
+    <aside class="video-panel">
+      <p class="eyebrow">{lang === 'zh' ? '视频' : lang === 'en' ? 'Video' : 'Video'}</p>
+      <h2 class="mt-3 text-2xl font-semibold">{setting?.data.videoTitle}</h2>
+      <p class="mt-3 text-sm text-soft">{setting?.data.videoDescription}</p>
+      <div class="mt-5 aspect-video border border-line bg-ink">
+        {videoEmbed ? (
+          <iframe
+            class="h-full w-full"
+            src={videoEmbed}
+            title={setting?.data.videoTitle}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        ) : (
+          <div class="grid h-full place-items-center p-5 text-center text-sm text-bg/70">Video URL</div>
+        )}
+      </div>
+    </aside>
+  </div>
+</section>
+
+<script>
+  const sliders = document.querySelectorAll('[data-banner-slider]');
+  sliders.forEach((slider) => {
+    const slides = Array.from(slider.querySelectorAll('[data-banner-slide]'));
+    const dots = Array.from(slider.querySelectorAll('[data-banner-dot]'));
+    if (slides.length <= 1) return;
+
+    let activeIndex = 0;
+    const showSlide = (nextIndex: number) => {
+      activeIndex = nextIndex;
+      slides.forEach((slide, index) => slide.classList.toggle('banner-slide-active', index === activeIndex));
+      dots.forEach((dot, index) => dot.setAttribute('aria-pressed', String(index === activeIndex)));
+    };
+
+    dots.forEach((dot, index) => dot.addEventListener('click', () => showSlide(index)));
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.setInterval(() => showSlide((activeIndex + 1) % slides.length), 5200);
+    }
+  });
+</script>

@@ -1,4 +1,5 @@
 ---
+language: "vi"
 name: "Dệt kim cotton và rib"
 category: "dệt kim"
 description: "Sản xuất áo thun, polo, đồ mặc nhà và chi tiết rib cho đơn hàng xuất khẩu Mỹ, EU với kiểm soát co rút, màu và đường may."

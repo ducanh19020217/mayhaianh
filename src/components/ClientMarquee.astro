@@ -1,0 +1,26 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ClientMark from './ClientMark.astro';
+
+type Props = {
+  clients: CollectionEntry<'clients'>[];
+};
+
+const { clients } = Astro.props;
+---
+{clients.length > 0 && (
+  <div class="marquee">
+    <div class="marquee-track">
+      {clients.map((client) => (
+        <div class="marquee-item">
+          <ClientMark client={client} />
+        </div>
+      ))}
+      {clients.map((client) => (
+        <div class="marquee-item marquee-clone" aria-hidden="true">
+          <ClientMark client={client} />
+        </div>
+      ))}
+    </div>
+  </div>
+)}

@@ -1,6 +1,15 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
+
+const entries = await getCollection('about');
+const bySection = (section: 'history' | 'vision' | 'organization') => entries.find((item) => item.data.section === section && item.data.language === 'vi');
+const cards = [
+  { eyebrow: '01', href: '/gioi-thieu/lich-su-phat-trien/', entry: bySection('history') },
+  { eyebrow: '02', href: '/gioi-thieu/tam-nhin-su-menh/', entry: bySection('vision') },
+  { eyebrow: '03', href: '/gioi-thieu/co-cau-to-chuc/', entry: bySection('organization') }
+];
 ---
 <BaseLayout title="Giới thiệu Hải Anh Textile" description="Lịch sử phát triển, tầm nhìn sứ mệnh và cơ cấu tổ chức của Hải Anh Textile.">
   <section class="container py-12 md:py-16">
@@ -9,17 +18,11 @@ import SectionHeader from '../../components/SectionHeader.astro';
   </section>
   <div class="stitch-line" aria-hidden="true"></div>
   <section class="container grid gap-8 py-4 md:grid-cols-3">
-    <article class="border border-line p-5">
-      <SectionHeader eyebrow="01" title="Lịch sử phát triển" />
-      <p class="text-soft">Từ xưởng dệt kim ban đầu, Hải Anh Textile mở rộng sang đồ lót, đồ bơi và dệt len để phục vụ chuỗi đơn hàng xuất khẩu có yêu cầu kỹ thuật cao.</p>
-    </article>
-    <article class="border border-line p-5">
-      <SectionHeader eyebrow="02" title="Tầm nhìn sứ mệnh" />
-      <p class="text-soft">Xây dựng năng lực may mặc Việt Nam theo hướng minh bạch hồ sơ, ổn định chất lượng và giao hàng có thể dự báo.</p>
-    </article>
-    <article class="border border-line p-5">
-      <SectionHeader eyebrow="03" title="Cơ cấu tổ chức" />
-      <p class="text-soft">Các bộ phận mẫu, kế hoạch, mua hàng, chuyền may, QC và logistics phối hợp quanh tech pack và lịch xuất hàng đã khóa.</p>
-    </article>
+    {cards.map(({ eyebrow, href, entry }) => entry && (
+      <a href={href} class="product-card border border-line p-5 transition hover:border-primary">
+        <SectionHeader eyebrow={eyebrow} title={entry.data.title} />
+        <p class="text-soft">{entry.data.summary}</p>
+      </a>
+    ))}
   </section>
 </BaseLayout>

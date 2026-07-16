@@ -1,4 +1,5 @@
 ---
+language: "vi"
 name: Siêu nhaao Gaorangers
 category: Đồ chơi trẻ em
 description: Siêu nhaao Gaorangers

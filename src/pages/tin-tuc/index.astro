@@ -1,20 +1,23 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { filterByLanguage, localized } from '../../lib/i18n';
 
-const posts = (await getCollection('blog')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const lang = 'vi';
+const t = localized[lang];
+const posts = filterByLanguage(await getCollection('blog'), lang).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const tags = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sort((a, b) => a.localeCompare(b, 'vi'));
 ---
-<BaseLayout title="Tin tức dệt may xuất khẩu" description="Bài viết về kiểm soát chất lượng, hồ sơ kỹ thuật và vận hành đơn hàng may xuất khẩu.">
+<BaseLayout lang={lang} title="Tin tức dệt may xuất khẩu" description="Bài viết về kiểm soát chất lượng, hồ sơ kỹ thuật và vận hành đơn hàng may xuất khẩu.">
   <section class="container py-12 md:py-16">
     <p class="eyebrow">Tin tức</p>
-    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">Ghi chú vận hành từ xưởng may xuất khẩu.</h1>
+    <h1 class="heading mt-4 max-w-4xl text-5xl md:text-7xl">{t.newsTitle}</h1>
   </section>
   <div class="stitch-line" aria-hidden="true"></div>
   <section class="container py-4" data-post-browser>
-    <div class="mb-6 grid gap-4 border border-line p-4 md:grid-cols-[1fr_1.4fr]">
+    <div class="filter-panel mb-6 grid gap-4 border border-line p-4 md:grid-cols-[1fr_1.4fr]">
       <div>
-        <label class="font-mono text-xs text-primary" for="post-search">Tìm theo tiêu đề</label>
+        <label class="font-mono text-xs text-primary" for="post-search">{t.searchPosts}</label>
         <input
           id="post-search"
           data-post-search
@@ -25,9 +28,9 @@ const tags = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sort((
         />
       </div>
       <div>
-        <p class="font-mono text-xs text-primary">Lọc theo tag</p>
+        <p class="font-mono text-xs text-primary">{t.filterTag}</p>
         <div class="mt-2 flex flex-wrap gap-2" role="group" aria-label="Lọc bài viết theo tag">
-          <button class="btn btn-primary min-h-10 px-3 py-2 text-sm" type="button" data-tag-filter="all" aria-pressed="true">Tất cả</button>
+          <button class="btn btn-primary min-h-10 px-3 py-2 text-sm" type="button" data-tag-filter="all" aria-pressed="true">{t.all}</button>
           {tags.map((tag) => (
             <button class="btn btn-plain min-h-10 px-3 py-2 text-sm" type="button" data-tag-filter={tag} aria-pressed="false">
               {tag}
@@ -36,12 +39,12 @@ const tags = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sort((
         </div>
       </div>
     </div>
-    <p class="mb-4 font-mono text-xs text-soft" data-post-count>{posts.length} bài viết</p>
+    <p class="mb-4 font-mono text-xs text-soft" data-post-count>{posts.length} {t.postUnit}</p>
     <div class="grid gap-5 md:grid-cols-2" data-post-grid>
       {posts.map((post) => (
         <a
           href={`/tin-tuc/${post.id}/`}
-          class="thread-hover border border-line p-5"
+          class="product-card thread-hover border border-line p-5"
           data-post-card
           data-tags={post.data.tags.map((tag) => tag.toLocaleLowerCase('vi-VN')).join('|')}
           data-search={`${post.data.title} ${post.data.description} ${post.data.excerpt} ${post.data.tags.join(' ')}`.toLocaleLowerCase('vi-VN')}
@@ -55,7 +58,7 @@ const tags = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sort((
         </a>
       ))}
     </div>
-    <p class="hidden border border-line p-5 text-soft" data-empty-state>Không có bài viết phù hợp.</p>
+    <p class="hidden border border-line p-5 text-soft" data-empty-state>{t.noPosts}</p>
   </section>
   <script>
     const browser = document.querySelector('[data-post-browser]');
@@ -89,7 +92,7 @@ const tags = Array.from(new Set(posts.flatMap((post) => post.data.tags))).sort((
         if (isVisible) visibleCount += 1;
       });
 
-      if (count) count.textContent = `${visibleCount} bài viết`;
+      if (count) count.textContent = `${visibleCount} ${document.documentElement.lang === 'vi' ? 'bài viết' : document.documentElement.lang === 'zh-CN' ? '篇文章' : 'articles'}`;
       emptyState?.classList.toggle('hidden', visibleCount !== 0);
     }
 
