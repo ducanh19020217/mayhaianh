@@ -4,5 +4,8 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://haianhtex.com',
   output: 'static',
-  integrations: [sitemap()]
+  integrations: [sitemap()],
+  build: {
+    inlineStylesheets: 'always'
+  }
 });

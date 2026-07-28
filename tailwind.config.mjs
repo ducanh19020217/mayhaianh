@@ -15,7 +15,7 @@ export default {
         line: 'var(--color-line)'
       },
       fontFamily: {
-        serif: ['Fraunces', 'Source Serif 4', 'Georgia', 'serif'],
+        serif: ['Fraunces Variable', 'Source Serif 4', 'Georgia', 'serif'],
         sans: ['Inter', 'IBM Plex Sans', 'Arial', 'sans-serif'],
         mono: ['IBM Plex Mono', 'ui-monospace', 'SFMono-Regular', 'monospace']
       },

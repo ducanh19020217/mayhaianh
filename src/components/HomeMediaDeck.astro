@@ -34,9 +34,22 @@ const videoEmbed = setting ? getYouTubeEmbedUrl(setting.data.videoUrl) : '';
       {activeBanners.map((banner, index) => (
         <article class={index === 0 ? 'banner-slide banner-slide-active' : 'banner-slide'} data-banner-slide>
           {isRemoteImage(banner.data.image) ? (
-            <img src={getImageUrl(banner.data.image)} alt={banner.data.imageAlt} loading={index === 0 ? 'eager' : 'lazy'} />
+            <img
+              src={getImageUrl(banner.data.image)}
+              alt={banner.data.imageAlt}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+            />
           ) : (
-            <Image src={getAssetImage(banner.data.image)} alt={banner.data.imageAlt} width={980} loading={index === 0 ? 'eager' : 'lazy'} />
+            <Image
+              src={getAssetImage(banner.data.image)}
+              alt={banner.data.imageAlt}
+              width={980}
+              widths={[480, 750, 980, 1440]}
+              sizes="(min-width: 768px) 720px, 100vw"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchpriority={index === 0 ? 'high' : 'auto'}
+            />
           )}
           <div class="banner-caption">
             <p class="font-mono text-xs text-accent">{String(index + 1).padStart(2, '0')} / {String(activeBanners.length).padStart(2, '0')}</p>

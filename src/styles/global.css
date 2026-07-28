@@ -96,7 +96,7 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 .heading {
-  font-family: Fraunces, "Source Serif 4", Georgia, serif;
+  font-family: "Fraunces Variable", "Source Serif 4", Georgia, serif;
   font-weight: 600;
   line-height: 1.04;
   letter-spacing: -0.025em;
@@ -108,6 +108,12 @@ img { display: block; max-width: 100%; height: auto; }
   font-size: 0.78rem;
   letter-spacing: 0;
   text-transform: uppercase;
+}
+
+/* .eyebrow's own color rule otherwise beats the text-accent utility class
+   at equal specificity since it comes later in the cascade. */
+.eyebrow.text-accent {
+  color: var(--color-accent);
 }
 
 .stitch-line {

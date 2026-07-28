@@ -1,5 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import '@fontsource/ibm-plex-mono/600.css';
+import '@fontsource-variable/fraunces/standard.css';
 import '../styles/global.css';
 import { site, defaultOgImage } from '../lib/site';
 import { languages, languageFlags, localized, detectAlternates, filterByLanguage, type Language } from '../lib/i18n';
@@ -54,9 +62,6 @@ const copyrightYear = new Date().getFullYear();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -96,15 +101,26 @@ const copyrightYear = new Date().getFullYear();
       }
     </script>
     {gaId && (
-      <>
-        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
-        <script is:inline define:vars={{ gaId }}>
+      <script is:inline define:vars={{ gaId }}>
+        // Loaded on idle/load instead of during the initial parse so gtag.js's
+        // own layout reads don't compete with the critical rendering path.
+        function loadGa() {
           window.dataLayer = window.dataLayer || [];
           function gtag() { dataLayer.push(arguments); }
+          window.gtag = gtag;
           gtag('js', new Date());
           gtag('config', gaId);
-        </script>
-      </>
+          const s = document.createElement('script');
+          s.async = true;
+          s.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
+          document.head.appendChild(s);
+        }
+        if ('requestIdleCallback' in window) {
+          window.addEventListener('load', () => requestIdleCallback(loadGa));
+        } else {
+          window.addEventListener('load', () => setTimeout(loadGa, 1));
+        }
+      </script>
     )}
   </head>
   <body>
